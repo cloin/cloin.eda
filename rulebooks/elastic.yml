@@ -1,0 +1,19 @@
+- name: Elastic events
+  hosts: localhost
+  sources:
+    - elastic:
+        elastic_host: elasticsearch
+        elastic_port: 9200
+        elastic_username: elastic
+        elastic_password: elastic
+        elastic_index_pattern: filebeat-*
+        query: |
+          term:
+            container.name.keyword: nginx
+        interval: 5
+
+  rules:
+    - name: Debug event
+      condition: event.ecs is defined and event.nginx.log_level == "error"
+      action:
+        debug:

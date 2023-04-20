@@ -1,1 +1,3 @@
-# cloin.elastic
+# Ansible Collection - cloin.eda
+
+Documentation for the collection.
