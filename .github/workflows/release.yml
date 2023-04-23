@@ -3,7 +3,7 @@ name: Release Ansible Collection
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
   workflow_dispatch:
     inputs:
       release_version:
