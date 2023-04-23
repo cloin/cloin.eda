@@ -53,8 +53,8 @@ jobs:
 
     - name: Extract namespace and collection name from galaxy.yml
       run: |
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=namespace::{data['namespace']}') " | tee -a $GITHUB_ENV
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=collection::{data['name']}') " | tee -a $GITHUB_ENV
+        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=namespace::{data[\"namespace\"]}') " | tee -a $GITHUB_ENV
+        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=collection::{data[\"name\"]}') " | tee -a $GITHUB_ENV
 
     - name: Create GitHub Release
       id: create_release
