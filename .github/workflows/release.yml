@@ -78,6 +78,8 @@ jobs:
         asset_name: ${{ env.NAMESPACE }}-${{ env.COLLECTION }}-${{ env.NEW_VERSION }}.tar.gz
         asset_content_type: application/gzip
 
-
     - name: Publish to Ansible Galaxy
+      id: publish_to_galaxy
       run: ansible-galaxy collection publish ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz --api-key=${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+      retries: 5
+      continue-on-error: true
