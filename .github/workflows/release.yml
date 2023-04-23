@@ -1,4 +1,4 @@
-name: Release Ansible Collection
+name: Release Ansible Collection ${{ env.NEW_VERSION }}
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Release version (e.g., v1.0.0)'
+        description: 'Release version (e.g., 1.0.0)'
         required: true
 
 permissions:
@@ -80,4 +80,7 @@ jobs:
 
 
     - name: Publish to Ansible Galaxy
+      id: publish_to_galaxy
       run: ansible-galaxy collection publish ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz --api-key=${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+      retries: 5
+      continue-on-error: true
