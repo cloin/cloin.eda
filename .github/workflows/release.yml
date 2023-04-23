@@ -53,8 +53,8 @@ jobs:
 
     - name: Extract namespace and collection name from galaxy.yml
       run: |
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=namespace::{data[\"namespace\"]}') " | tee -a $GITHUB_ENV
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=collection::{data[\"name\"]}') " | tee -a $GITHUB_ENV
+        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=namespace::{data[\"namespace\"]}') " >> $GITHUB_ENV
+        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=collection::{data[\"name\"]}') " >> $GITHUB_ENV
 
     - name: Create GitHub Release
       id: create_release
@@ -72,8 +72,4 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
-        asset_name: $NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
-        asset_content_type: application/gzip
-
-    - name: Publish to Ansible Galaxy
-      run: ansible-galaxy collection publish ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz --api-key=${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+        asset_name: $NAMESPACE-$
