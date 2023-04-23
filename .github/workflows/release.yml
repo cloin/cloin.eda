@@ -10,9 +10,6 @@ on:
         description: 'Release version (e.g., v1.0.0)'
         required: true
 
-permissions:
-  contents: write
-
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -29,7 +26,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install ansible pyyaml
+        pip install ansible
+        sudo apt-get install -y jq
+        wget https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
     - name: Set release version
       run: |
@@ -49,16 +48,15 @@ jobs:
         git push origin $NEW_VERSION
 
     - name: Update galaxy.yml with new version
-      run: |
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); data['version'] = '$NEW_VERSION'; with open('galaxy.yml', 'w') as outfile: yaml.safe_dump(data, outfile, default_flow_style=False)"
+      run: yq eval -i '.version = env(NEW_VERSION)' galaxy.yml
 
     - name: Build Ansible Collection
       run: ansible-galaxy collection build
 
     - name: Extract namespace and collection name from galaxy.yml
       run: |
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=namespace::{data[\"namespace\"]}') " >> $GITHUB_ENV
-        python -c "import yaml; data = yaml.safe_load(open('galaxy.yml')); print(f'::set-output name=collection::{data[\"name\"]}') " >> $GITHUB_ENV
+        echo "NAMESPACE=$(yq eval '.namespace' galaxy.yml)" >> $GITHUB_ENV
+        echo "COLLECTION=$(yq eval '.name' galaxy.yml)" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       id: create_release
@@ -76,4 +74,8 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
-        asset_name: $NAMESPACE-$
+        asset_name: $NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Publish to Ansible Galaxy
+      run: ansible-galaxy collection publish ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz --api-key=${{ secrets.ANSIBLE_GALAXY_API_KEY }}
