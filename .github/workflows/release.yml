@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
 
 jobs:
   release:
@@ -23,10 +28,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install ansible pyyaml
 
-    - name: Update galaxy.yml with new version
+    - name: Set release version
       run: |
-        export NEW_VERSION=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
-        sed -i "s/version: .*/version: $NEW_VERSION/" galaxy.yml
+        if [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+          export NEW_VERSION=${{ github.event.inputs.release_version }}
+        else
+          export NEW_VERSION=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+        fi
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+    - name: Create and push tag if workflow_dispatch
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git tag $NEW_VERSION
+        git push origin $NEW_VERSION
+
+    - name: Update galaxy.yml with new version
+      run: sed -i "s/version: .*/version: $NEW_VERSION/" galaxy.yml
 
     - name: Build Ansible Collection
       run: ansible-galaxy collection build
@@ -42,8 +62,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ env.NEW_VERSION }}
+        release_name: Release ${{ env.NEW_VERSION }}
 
     - name: Upload Collection to GitHub Release
       uses: actions/upload-release-asset@v1
