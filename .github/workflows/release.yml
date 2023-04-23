@@ -74,9 +74,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
-        asset_name: $NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz
+        asset_path: ./${{ env.NAMESPACE }}-${{ env.COLLECTION }}-${{ env.NEW_VERSION }}.tar.gz
+        asset_name: ${{ env.NAMESPACE }}-${{ env.COLLECTION }}-${{ env.NEW_VERSION }}.tar.gz
         asset_content_type: application/gzip
+
 
     - name: Publish to Ansible Galaxy
       run: ansible-galaxy collection publish ./$NAMESPACE-$COLLECTION-$NEW_VERSION.tar.gz --api-key=${{ secrets.ANSIBLE_GALAXY_API_KEY }}
