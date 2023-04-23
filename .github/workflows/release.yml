@@ -1,4 +1,4 @@
-name: Release Ansible Collection - ${{ github.ref }}
+name: Release Ansible Collection
 
 on:
   push:
