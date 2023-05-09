@@ -4,7 +4,7 @@ Event-Driven Ansible content
 
 ## Included Content
 
-The following custom source plugins are included within this collection:
+The following custom event source plugins for Event-Driven Ansible are included within this collection:
 
 ### Event Sources 
 
