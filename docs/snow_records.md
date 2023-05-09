@@ -15,11 +15,11 @@ environment variables for SN_HOST, SN_USERNAME, SN_PASSWORD, SN_TABLE
 | Argument | Description |
 | --- | --- |
 | instance | ServiceNow instance (e.g. https://dev-012345.service-now.com) |
-username: ServiceNow username
-password: ServiceNow password
-table:    Table to watch for new records
-query:    (optional) Records to query. Defaults to records created today
-interval: (optional) How often to poll for new records. Defaults to 5 seconds
+| username | ServiceNow username |
+| password | ServiceNow password |
+| table | Table to watch for new records |
+| query | (optional) Records to query. Defaults to records created today |
+| interval | (optional) How often to poll for new records. Defaults to 5 seconds |
 
 ### Example(s):
 ```yaml
