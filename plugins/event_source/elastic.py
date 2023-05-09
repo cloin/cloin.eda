@@ -1,8 +1,5 @@
 
 DOCUMENTATION = r'''
-#
-# See https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_documenting.html for more information
-#
 module: elastic
 short_description: event-driven ansible source plugin for Elasticsearch
 description:

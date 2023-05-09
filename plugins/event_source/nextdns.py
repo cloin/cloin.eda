@@ -1,27 +1,29 @@
-"""
-## Plugin:
-    nextdns.py
 
-## Purpose
-    An ansible-rulebook event source plugin for NextDNS logs
+DOCUMENTATION = r'''
+module: nextdns
+short_description: An ansible-rulebook event source plugin for NextDNS logs
+description:
+    - Uses the NextDNS API to subscribe to a SSE event stream for the logs of a specific profile and use these as events in Event-Driven Ansible
+author: "Colin McNaughton (@cloin)"
+options:
+    api_key:
+        description:
+            - Your NextDNS API key
+        required: true
+    profile_id:
+        description:
+            - Your NextDNS profile ID
+        required: true
+'''
 
-## Description:
-    Uses the NextDNS API to subscribe to a SSE event stream
-    for the logs of a specific profile and use these as events
-    in Event-Driven Ansible
-
-## Arguments:
-    api_key: Your NextDNS API key
-    profile_id: Your NextDNS profile ID
-
-## Examples:
-    - name: NextDNS event stream
-        hosts: localhost
-        sources:
-        - cloin.eda.nextdns:
-            profile_id: ""
-            api_key: ""
-"""
+EXAMPLES = r'''
+- name: NextDNS event stream
+    hosts: localhost
+    sources:
+    - cloin.eda.nextdns:
+        profile_id: ""
+        api_key: ""
+'''
 
 import asyncio
 import aiohttp
