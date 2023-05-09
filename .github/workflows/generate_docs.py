@@ -7,6 +7,8 @@ docs_dir = "docs/"
 if not os.path.exists(docs_dir):
     os.makedirs(docs_dir)
 
+readme_lines = ["# Event Source Plugins\n\n", "| Plugin | Purpose |\n", "| --- | --- |\n"]
+
 for file in os.listdir(plugin_dir):
     if file.endswith(".py"):
         with open(os.path.join(plugin_dir, file), "r") as f:
@@ -20,8 +22,12 @@ for file in os.listdir(plugin_dir):
                 markdown = []
                 table_header_created = False
                 parsing_arguments = False
+                purpose = ""
 
                 for line in lines:
+                    if line.startswith("## Purpose:"):
+                        purpose = line[11:].strip()
+
                     if line.startswith("## "):
                         markdown.append(f"### {line[3:]}\n")
                         if "## Arguments:" in line:
@@ -47,5 +53,10 @@ for file in os.listdir(plugin_dir):
 
                 with open(os.path.join(docs_dir, f"{file[:-3]}.md"), "w") as md_file:
                     md_file.writelines(markdown)
+
+                readme_lines.append(f"| [{file[:-3]}]({file[:-3]}.md) | {purpose} |\n")
+
+with open(os.path.join(docs_dir, "README.md"), "w") as readme_file:
+    readme_file.writelines(readme_lines)
 
 print("Markdown documentation generated successfully.")
