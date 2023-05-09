@@ -13,17 +13,17 @@
 
 ## Arguments:
     instance: ServiceNow instance (e.g. https://dev-012345.service-now.com)
-    username: ServiceNow username
-    password: ServiceNow password
-    table:    Table to watch for new records
-    query:    (optional) Records to query. Defaults to records created today
-    interval: (optional) How often to poll for new records. Defaults to 5 seconds
+    username: ServiceNow basic auth username
+    password: ServiceNow basic auth password
+    table:    Table to poll for new records
+    query:    (optional) Records to query (default: records created today)
+    interval: How often in seconds to poll for new records (default: 5)
 
 ## Example(s):
     - name: Watch for new records
         hosts: localhost
         sources:
-        - cloin.servicenow.new_records:
+        - cloin.eda.snow_records:
             instance: https://dev-012345.service-now.com
             username: ansible
             password: ansible
