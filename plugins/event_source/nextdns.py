@@ -18,9 +18,9 @@
     - name: NextDNS event stream
         hosts: localhost
         sources:
-            - cloin.eda.nextdns:
-                profile_id: ""
-                api_key: ""
+        - cloin.eda.nextdns:
+            profile_id: ""
+            api_key: ""
 """
 
 import asyncio
