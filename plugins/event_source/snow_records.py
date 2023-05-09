@@ -16,6 +16,7 @@ Arguments:
   - query:    (optional) Records to query. Defaults to records created today
   - interval: (optional) How often to poll for new records. Defaults to 5 seconds
 
+Example(s):
 - name: Watch for new records
   hosts: localhost
   sources:

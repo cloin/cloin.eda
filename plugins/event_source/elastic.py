@@ -17,20 +17,20 @@ Arguments:
   - query: query to be used to return matching log lines
   - interval: seconds to wait before performing another query (default: 5)
 
-Example:
+Example(s):
   - name: Elastic events
-  hosts: localhost
-  sources:
-    - cloin.eda.elastic:
-        elastic_host: elasticsearch
-        elastic_port: 9200
-        elastic_username: elastic
-        elastic_password: elastic!
-        elastic_index_pattern: filebeat-*
-        query: |
-          term:
-            container.name.keyword: nginx
-        interval: 5
+    hosts: localhost
+    sources:
+        - cloin.eda.elastic:
+            elastic_host: elasticsearch
+            elastic_port: 9200
+            elastic_username: elastic
+            elastic_password: elastic!
+            elastic_index_pattern: filebeat-*
+            query: |
+            term:
+                container.name.keyword: nginx
+            interval: 5
 
 """
 import asyncio
