@@ -4,12 +4,12 @@ from pathlib import Path
 
 def parse_doc_section(doc_section):
     lines = doc_section.strip().split('\n')[1:-1]  # Remove the """ lines
-    headings = [i for i, line in enumerate(lines) if line.strip().endswith(':')]
+    headings = [i for i, line in enumerate(lines) if line.strip().startswith('## ')]
 
     sections = {}
     for i, start in enumerate(headings):
         end = headings[i + 1] if i + 1 < len(headings) else len(lines)
-        key = lines[start].strip()[:-1]
+        key = lines[start].strip()[3:]  # Remove '## ' from the heading
         value = '\n'.join(lines[start + 1:end]).strip()
         sections[key] = value
 

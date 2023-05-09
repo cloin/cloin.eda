@@ -1,17 +1,17 @@
 """
-Plugin:
+## Plugin:
     new_records.py
 
-Purpose:
+## Purpose:
     event-driven-ansible source plugin example
 
-Description:
+## Description:
     Poll ServiceNow API for new records in a table
     Only retrieves records created after the script began executing
     This script can be tested outside of ansible-rulebook by specifying
     environment variables for SN_HOST, SN_USERNAME, SN_PASSWORD, SN_TABLE
 
-Arguments:
+## Arguments:
     instance: ServiceNow instance (e.g. https://dev-012345.service-now.com)
     username: ServiceNow username
     password: ServiceNow password
@@ -19,7 +19,7 @@ Arguments:
     query:    (optional) Records to query. Defaults to records created today
     interval: (optional) How often to poll for new records. Defaults to 5 seconds
 
-Example(s):
+## Example(s):
     - name: Watch for new records
         hosts: localhost
         sources:
