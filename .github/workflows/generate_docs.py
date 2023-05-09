@@ -29,7 +29,7 @@ for file in os.listdir(plugin_dir):
                                 markdown.append("| Argument | Description |\n| --- | --- |\n")
                                 table_header_created = True
                             arg_name, arg_desc = line[4:].split(": ", 1)
-                            markdown.append(f"| {arg_name} | {arg_desc} |\n")
+                            markdown.append(f"| {arg_name.strip()} | {arg_desc.strip()} |\n")
                         elif "## Example(s):" in markdown[-1]:
                             markdown.append("```yaml\n" + line[4:] + "\n")
                         else:
