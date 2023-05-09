@@ -1,53 +1,46 @@
 import os
 import re
-from pathlib import Path
 
-def parse_doc_section(doc_section):
-    lines = doc_section.strip().split('\n')[1:-1]  # Remove the """ lines
-    headings = [i for i, line in enumerate(lines) if line.strip().startswith('## ')]
+plugin_dir = "plugins/event_source/"
+docs_dir = "docs/"
 
-    sections = {}
-    for i, start in enumerate(headings):
-        end = headings[i + 1] if i + 1 < len(headings) else len(lines)
-        key = lines[start].strip()[3:]  # Remove '## ' from the heading
-        value = '\n'.join(lines[start + 1:end]).strip()
-        sections[key] = value
+if not os.path.exists(docs_dir):
+    os.makedirs(docs_dir)
 
-    return sections
-
-def generate_markdown(sections):
-    markdown = ""
-    for key, value in sections.items():
-        markdown += f"## {key}\n\n"
-        if key == "Arguments":
-            markdown += "| Argument | Description |\n"
-            markdown += "| -------- | ----------- |\n"
-            for arg in value.split('\n'):
-                arg_name, arg_desc = arg.split(':', 1)
-                markdown += f"| {arg_name.strip()} | {arg_desc.strip()} |\n"
-        elif key == "Example(s)":
-            markdown += f"```yaml\n{value.strip()}\n```\n"
-        else:
-            markdown += f"{value}\n"
-        markdown += "\n"
-    return markdown
-
-def main():
-    source_dir = Path("plugins/event_source")
-    docs_dir = Path("docs")
-
-    for python_file in source_dir.glob("*.py"):
-        with open(python_file, 'r') as f:
+for file in os.listdir(plugin_dir):
+    if file.endswith(".py"):
+        with open(os.path.join(plugin_dir, file), "r") as f:
             content = f.read()
+            match = re.search(r'""".*?"""', content, re.DOTALL)
 
-        doc_section = re.search(r'""".*?"""', content, re.DOTALL)
-        if doc_section:
-            sections = parse_doc_section(doc_section.group(0))
-            markdown = generate_markdown(sections)
+            if match:
+                comment = match.group(0).strip('"""')
+                lines = comment.split("\n")
 
-            md_file_path = docs_dir / f"{python_file.stem}.md"
-            with open(md_file_path, 'w') as f:
-                f.write(markdown)
+                markdown = []
+                table_header_created = False
 
-if __name__ == "__main__":
-    main()
+                for line in lines:
+                    if line.startswith("## "):
+                        markdown.append(f"### {line[3:]}\n")
+                    elif line.startswith("    "):
+                        if "## Arguments:" in markdown[-1]:
+                            if not table_header_created:
+                                markdown.append("| Argument | Description |\n| --- | --- |\n")
+                                table_header_created = True
+                            arg_name, arg_desc = line[4:].split(": ", 1)
+                            markdown.append(f"| {arg_name} | {arg_desc} |\n")
+                        elif "## Example(s):" in markdown[-1]:
+                            markdown.append("```yaml\n" + line[4:] + "\n")
+                        else:
+                            markdown.append(line[4:] + "\n")
+                    else:
+                        markdown.append(line + "\n")
+
+                if "## Example(s):" in markdown[-1]:
+                    markdown.append("```\n")
+
+                with open(os.path.join(docs_dir, f"{file[:-3]}.md"), "w") as md_file:
+                    md_file.writelines(markdown)
+
+print("Markdown documentation generated successfully.")
