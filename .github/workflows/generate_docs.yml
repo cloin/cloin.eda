@@ -28,7 +28,7 @@ jobs:
 
       - name: Generate documentation
         run: |
-          python generate_docs.py
+          python .github/workflows/generate_docs.py
 
       - name: Commit and push changes
         run: |
