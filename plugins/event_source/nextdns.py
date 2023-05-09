@@ -18,7 +18,7 @@
     - name: NextDNS event stream
         hosts: localhost
         sources:
-            - nextdns:
+            - cloin.eda.nextdns:
                 profile_id: ""
                 api_key: ""
 """
