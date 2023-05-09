@@ -3,29 +3,33 @@ import re
 from pathlib import Path
 
 def parse_doc_section(doc_section):
-    lines = doc_section.strip().split('\n')
-    file_name = lines[0].strip()
-    args_start = lines.index("Arguments:") + 1
-    args_end = lines.index("Example(s):")
-    args = [arg.strip().split(':', 1) for arg in lines[args_start:args_end] if arg.strip()]
-    example = '\n'.join(lines[args_end+1:])
+    lines = doc_section.strip().split('\n')[1:-1]  # Remove the """ lines
+    headings = [i for i, line in enumerate(lines) if line.strip().endswith(':')]
 
-    return file_name, args, example
+    sections = {}
+    for i, start in enumerate(headings):
+        end = headings[i + 1] if i + 1 < len(headings) else len(lines)
+        key = lines[start].strip()[:-1]
+        value = '\n'.join(lines[start + 1:end]).strip()
+        sections[key] = value
 
-def generate_markdown(file_name, args, example):
-    markdown = f"# {file_name}\n\n"
+    return sections
 
-    if args:
-        markdown += "## Arguments\n\n"
-        markdown += "| Argument | Description |\n"
-        markdown += "| -------- | ----------- |\n"
-        for arg in args:
-            markdown += f"| {arg[0].strip()} | {arg[1].strip()} |\n"
+def generate_markdown(sections):
+    markdown = ""
+    for key, value in sections.items():
+        markdown += f"## {key}\n\n"
+        if key == "Arguments":
+            markdown += "| Argument | Description |\n"
+            markdown += "| -------- | ----------- |\n"
+            for arg in value.split('\n'):
+                arg_name, arg_desc = arg.split(':', 1)
+                markdown += f"| {arg_name.strip()} | {arg_desc.strip()} |\n"
+        elif key == "Example(s)":
+            markdown += f"```yaml\n{value}\n```\n"
+        else:
+            markdown += f"{value}\n"
         markdown += "\n"
-
-    markdown += "## Example(s)\n\n"
-    markdown += f"```yaml\n{example}\n```\n"
-
     return markdown
 
 def main():
@@ -38,8 +42,8 @@ def main():
 
         doc_section = re.search(r'""".*?"""', content, re.DOTALL)
         if doc_section:
-            file_name, args, example = parse_doc_section(doc_section.group(0))
-            markdown = generate_markdown(file_name, args, example)
+            sections = parse_doc_section(doc_section.group(0))
+            markdown = generate_markdown(sections)
 
             md_file_path = docs_dir / f"{python_file.stem}.md"
             with open(md_file_path, 'w') as f:
