@@ -26,7 +26,7 @@ def generate_markdown(sections):
                 arg_name, arg_desc = arg.split(':', 1)
                 markdown += f"| {arg_name.strip()} | {arg_desc.strip()} |\n"
         elif key == "Example(s)":
-            markdown += f"```yaml\n{value}\n```\n"
+            markdown += f"```yaml\n{value.strip()}\n```\n"
         else:
             markdown += f"{value}\n"
         markdown += "\n"
