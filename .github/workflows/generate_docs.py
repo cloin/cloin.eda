@@ -19,12 +19,17 @@ for file in os.listdir(plugin_dir):
 
                 markdown = []
                 table_header_created = False
+                parsing_arguments = False
 
                 for line in lines:
                     if line.startswith("## "):
                         markdown.append(f"### {line[3:]}\n")
+                        if "## Arguments:" in line:
+                            parsing_arguments = True
+                        else:
+                            parsing_arguments = False
                     elif line.startswith("    "):
-                        if "## Arguments:" in markdown[-1]:
+                        if parsing_arguments:
                             if not table_header_created:
                                 markdown.append("| Argument | Description |\n| --- | --- |\n")
                                 table_header_created = True
