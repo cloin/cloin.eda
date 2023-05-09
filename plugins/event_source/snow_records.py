@@ -5,8 +5,7 @@ short_description: event-driven-ansible source plugin for ServiceNow records
 description:
     - Poll ServiceNow API for new records in a table
     - Only retrieves records created after the script began executing
-    - This script can be tested outside of ansible-rulebook by specifying
-    environment variables for `SN_HOST`, `SN_USERNAME`, `SN_PASSWORD`, `SN_TABLE`
+    - This script can be tested outside of ansible-rulebook by specifying environment variables for SN_HOST, SN_USERNAME, SN_PASSWORD, SN_TABLE
 author: "Colin McNaughton (@cloin)"
 options:
     instance:
@@ -27,7 +26,7 @@ options:
         required: true
     query:
         description:
-            - Records to query (default: records created today)
+            - Records to query
         required: false
         default: sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()
     interval:
