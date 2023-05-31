@@ -14,7 +14,7 @@ Synopsis
 
 Subscribes topic on mqtt and prints messages to ansible-rulebook
 
-Test script stand-alone by exporting MQTT_HOST and MQTT_TOPIC as environment variables MQTT_HOST, MQTT_TOPIC
+Test script stand-alone by exporting MQTT_HOST and MQTT_TOPIC as environment variables
 
 
 
