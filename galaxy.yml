@@ -3,7 +3,7 @@ name: eda
 version: 1.0.1
 readme: README.md
 authors:
-  - Colin McNaughton <c.a.mcnaughton@gmail.com>
+  - Colin McNaughton <@cloin>
 description: Event-Driven Ansible content
 license_file: 'LICENSE'
 tags:
@@ -12,6 +12,6 @@ tags:
   - infrastructure
 dependencies: {}
 repository: https://github.com/cloin/cloin.eda
-documentation: https://github.com/cloin/cloin.eda
-issues: https://github.com/cloin/cloin.eda
+documentation: https://github.com/cloin/cloin.eda/tree/main/docs
+issues: https://github.com/cloin/cloin.eda/issues
 build_ignore: []
