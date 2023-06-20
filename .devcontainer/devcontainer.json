@@ -1,0 +1,9 @@
+{
+    "name": "Fedora DevContainer",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": { }
+    },
+
+    "runArgs": [ ]
+}
