@@ -1,0 +1,18 @@
+---
+- name: Respond to webhook POST
+  hosts: localhost
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+      filters:
+        - cloin.eda.poster:
+            webhook_url: https://webhook.site/40a9669f-3cc0-4491-bf5c-88f81e065d33
+            search: "hey"
+
+  rules:
+    - name: R1 - Heard "Hello!"
+      condition: event.payload.message == "Hello!"
+      action:
+        debug:
+          msg: "You said, '{{ event.payload.message }}'. Is it me you're looking for?"
