@@ -43,36 +43,27 @@ def main(event: dict, webhook_url: str, search: str = None) -> dict:
                search: "hey"
             
     """
-    # Convert the dictionary to a string to search for the substring
     event_str = str(event)
 
-    # If a search string is provided and it's not in the event dictionary, log a warning and return the event
     if search is not None and search not in event_str:
         logging.warning("String not found")
         return event
 
     try:
-        # Send the POST request
         response = requests.post(webhook_url, json=event)
-        
-        # Raise an exception if the request was unsuccessful
         response.raise_for_status()
 
     except requests.exceptions.RequestException as e:
-        # If there's an HTTP error, log the exception and the response text (if available)
         logging.error(f"An HTTP error occurred: {e}")
         if response:
             logging.error(f"Response Text: {response.text}")
         return event
 
     except Exception as e:
-        # If there's some other error (like a network error, or a typo in the URL), log the exception
         logging.error(f"An error occurred: {e}")
         return event
 
     else:
-        # If the request was successful, log the status code
         logging.info(f"Response Status Code: {response.status_code}")
 
-    # Return the original event dictionary
     return event
