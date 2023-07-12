@@ -1,11 +1,12 @@
 import requests
 import logging
 
-def main(event: dict, webhook_url: str, search: str) -> dict:
+def main(event: dict, webhook_url: str, search: str = None) -> dict:
     """
     Perform an HTTP POST request to the specified webhook receiver URL with the 
     event dictionary as the JSON body, log the response, and return the event.
-    The dictionary is only sent if it contains the specified search string.
+    The dictionary is only sent if it contains the specified search string or if
+    the search string is not provided.
 
     THIS IS ONLY MEANT TO ASSIST IN DEV. I use this to better understand the
     event structure so that I can write rule conditions easier
@@ -16,8 +17,9 @@ def main(event: dict, webhook_url: str, search: str) -> dict:
         The dictionary to be sent as the JSON body of the POST request.
     webhook_url : str
         The URL of the webhook receiver.
-    search : str
-        The string to search for in the dictionary.
+    search : str, optional
+        The string to search for in the dictionary. If not provided, the event
+        is sent to the webhook URL regardless.
     
     Returns
     -------
@@ -44,8 +46,8 @@ def main(event: dict, webhook_url: str, search: str) -> dict:
     # Convert the dictionary to a string to search for the substring
     event_str = str(event)
 
-    # Check if the search string is in the event dictionary
-    if search not in event_str:
+    # If a search string is provided and it's not in the event dictionary, log a warning and return the event
+    if search is not None and search not in event_str:
         logging.warning("String not found")
         return event
 
