@@ -26,8 +26,7 @@ def main(event: dict, webhook_url: str, search: str) -> dict:
 
     Rulebook example
     ----------------
-    - name: Respond to webhook POST
-   ---
+
    - name: Respond to webhook POST
      hosts: localhost
      sources:
