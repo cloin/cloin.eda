@@ -6,6 +6,9 @@ def main(event: dict, webhook_url: str, search: str) -> dict:
     Perform an HTTP POST request to the specified webhook receiver URL with the 
     event dictionary as the JSON body, log the response, and return the event.
     The dictionary is only sent if it contains the specified search string.
+
+    THIS IS ONLY MEANT TO ASSIST IN DEV. I use this to better understand the
+    event structure so that I can write rule conditions easier
     
     Parameters
     ----------
@@ -20,6 +23,24 @@ def main(event: dict, webhook_url: str, search: str) -> dict:
     -------
     dict
         The original event dictionary.
+
+    Rulebook example
+    ----------------
+    - name: Respond to webhook POST
+   ---
+   - name: Respond to webhook POST
+     hosts: localhost
+     sources:
+       - ansible.eda.webhook:
+           host: 0.0.0.0
+           port: 5000
+         filters:
+           - ansible.eda.normalize_keys:
+           - ansible.eda.dashes_to_underscores:
+           - cloin.eda.poster:
+               webhook_url: https://webhook.site/40a9669f-3cc0-4491-bf5c-88f81e065d33
+               search: "hey"
+            
     """
     # Convert the dictionary to a string to search for the substring
     event_str = str(event)
