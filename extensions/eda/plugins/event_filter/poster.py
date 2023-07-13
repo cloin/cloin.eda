@@ -1,12 +1,12 @@
 import requests
 import logging
 
-def main(event: dict, webhook_url: str, search: str = None) -> dict:
+def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
     """
     Perform an HTTP POST request to the specified webhook receiver URL with the 
     event dictionary as the JSON body, log the response, and return the event.
-    The dictionary is only sent if it contains the specified search string or if
-    the search string is not provided.
+    The dictionary is only sent if the webhook_url and (the search string is provided 
+    and it is contained in the event or if the search string is not provided).
 
     THIS IS ONLY MEANT TO ASSIST IN DEV. I use this to better understand the
     event structure so that I can write rule conditions easier
@@ -15,8 +15,9 @@ def main(event: dict, webhook_url: str, search: str = None) -> dict:
     ----------
     event : dict
         The dictionary to be sent as the JSON body of the POST request.
-    webhook_url : str
-        The URL of the webhook receiver.
+    webhook_url : str, optional
+        The URL of the webhook receiver. If not provided, the event is not sent
+        and is simply returned.
     search : str, optional
         The string to search for in the dictionary. If not provided, the event
         is sent to the webhook URL regardless.
@@ -41,6 +42,10 @@ def main(event: dict, webhook_url: str, search: str = None) -> dict:
                search: "hey"
             
     """
+    if not webhook_url:
+        logging.info("Webhook URL not defined. The event dictionary will not be sent.")
+        return event
+
     event_str = str(event)
 
     if search is not None and search not in event_str:
