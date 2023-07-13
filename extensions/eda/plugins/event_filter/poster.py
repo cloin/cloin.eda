@@ -36,8 +36,6 @@ def main(event: dict, webhook_url: str, search: str = None) -> dict:
            host: 0.0.0.0
            port: 5000
          filters:
-           - ansible.eda.normalize_keys:
-           - ansible.eda.dashes_to_underscores:
            - cloin.eda.poster:
                webhook_url: https://webhook.site/asdfa2q3423-sadf-449231-asd-88f81e0asdf65d33
                search: "hey"
