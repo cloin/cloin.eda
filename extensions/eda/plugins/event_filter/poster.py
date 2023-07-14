@@ -53,6 +53,7 @@ def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
         return event
 
     try:
+        logging.info("POSTing event dictionary")
         response = requests.post(webhook_url, json=event)
         response.raise_for_status()
 
