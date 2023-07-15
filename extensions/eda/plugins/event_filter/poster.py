@@ -49,7 +49,7 @@ def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
     event_str = str(event)
 
     if search is not None and search not in event_str:
-        logging.warning("String '{search}' not found")
+        logging.warning(f"String '{search}' not found in event dictionary.")
         return event
 
     try:
