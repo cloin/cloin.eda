@@ -42,6 +42,9 @@ def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
                search: "hey"
             
     """
+    logging.info(f"Received webhook_url: {webhook_url}")
+    logging.info(f"Received search: {search}")
+    
     if not webhook_url:
         logging.info("Webhook URL not defined. The event dictionary will not be sent.")
         return event
