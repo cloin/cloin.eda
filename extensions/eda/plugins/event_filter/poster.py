@@ -1,12 +1,11 @@
 import requests
 import logging
 
-def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
+def main(event: dict, webhook_url: str = None) -> dict:
     """
     Perform an HTTP POST request to the specified webhook receiver URL with the 
     event dictionary as the JSON body, log the response, and return the event.
-    The dictionary is only sent if the webhook_url and (the search string is provided 
-    and it is contained in the event or if the search string is not provided).
+    The dictionary is only sent if the webhook_url is provided.
 
     THIS IS ONLY MEANT TO ASSIST IN DEV. I use this to better understand the
     event structure so that I can write rule conditions easier
@@ -18,9 +17,6 @@ def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
     webhook_url : str, optional
         The URL of the webhook receiver. If not provided, the event is not sent
         and is simply returned.
-    search : str, optional
-        The string to search for in the dictionary. If not provided, the event
-        is sent to the webhook URL regardless.
     
     Returns
     -------
@@ -39,20 +35,10 @@ def main(event: dict, webhook_url: str = None, search: str = None) -> dict:
          filters:
            - cloin.eda.poster:
                webhook_url: https://webhook.site/asdfa2q3423-sadf-449231-asd-88f81e0asdf65d33
-               search: "hey"
             
     """
-    logging.info(f"Received webhook_url: {webhook_url}")
-    logging.info(f"Received search: {search}")
-    
     if not webhook_url:
         logging.info("Webhook URL not defined. The event dictionary will not be sent.")
-        return event
-
-    event_str = str(event)
-
-    if not search or search not in event_str:
-        logging.warning(f"String '{search}' not found in event dictionary.")
         return event
 
     try:
