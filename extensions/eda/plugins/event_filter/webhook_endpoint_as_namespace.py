@@ -47,5 +47,6 @@ def main(event: dict) -> dict:
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
+        return event
     
     return event
