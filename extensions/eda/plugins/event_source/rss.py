@@ -16,7 +16,7 @@ short_description: Event-Driven Ansible source plugin for RSS feed events
 description:
     - Poll multiple RSS feeds for new items
     - Only retrieves items that occurred after the script began executing
-author: "Colin McNaughton (@cloin)"
+author: "Colin McNaughton ([@cloin](https://github.com/cloin))"
 options:
     feed_configs:
         description:
