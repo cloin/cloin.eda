@@ -98,5 +98,5 @@ Status
 Authors
 ~~~~~~~
 
-- Colin McNaughton [@cloin](https://github.com/cloin)
+- Colin McNaughton @cloin - https://github.com/cloin
 
