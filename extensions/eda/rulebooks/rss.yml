@@ -10,7 +10,7 @@
             content_tags: tags
             interval: 300
         interval: 7200
-        most_recent_item: true
+        most_recent_item: false
       filters:
         - ansible.eda.json_filter:
             exclude_keys:
