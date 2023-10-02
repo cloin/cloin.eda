@@ -57,23 +57,32 @@ Examples
 .. code-block:: yaml+jinja
 
     
-    - name: Respond to RSS feed events
-      hosts: all
+    - name: New Ansible blog post notifier
+      hosts: localhost
       sources:
-        - cloin.eda.rss:
+        - name: RSS feed items as events
+          cloin.eda.rss:
             feed_configs:
-              - url: "https://www.ansible.com/blog/rss.xml"
-                search: "python"
-                content_tags: "tags"
+              - name: Ansible blog
+                url: https://www.ansible.com/blog/rss.xml
+                search: ""
+                content_tags: tags
                 interval: 300
-              - url: "http://example.com/rss2"
             interval: 7200
-            most_recent_item: True
+            most_recent_item: false
+          filters:
+            - ansible.eda.json_filter:
+                exclude_keys:
+                  - summary
+
       rules:
-        - name: Catch all RSS feed items
-          condition: event.link is defined
+        - name: New EDA blog
+          condition: |
+            event.id is defined and
+            event.content_tags is search("Event-Driven Ansible",ignorecase=true)
           action:
             debug:
+
 
 
 
