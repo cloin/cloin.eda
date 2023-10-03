@@ -2,7 +2,7 @@
   hosts: localhost
   sources:
     - name: RSS feed items as events
-      rss:
+      cloin.eda.rss:
         feed_configs:
           - name: Ansible blog
             url: https://www.ansible.com/blog/rss.xml
@@ -31,7 +31,7 @@
               - summary_detail
 
   rules:
-    - name: New EDA blog
+    - name: New Event-Driven Ansible blog
       condition: |
         event.feed_name == "Ansible blog" and
         event.content_tags is search("Event-Driven Ansible",ignorecase=true)
