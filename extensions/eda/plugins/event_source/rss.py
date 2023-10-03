@@ -1,10 +1,9 @@
 import aiohttp
 import asyncio
 import feedparser
-import os
-import json
 import logging
-from datetime import datetime
+import json
+import os
 from typing import List, Dict, Optional, Any
 
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +24,7 @@ options:
             - Optionally, a 'search' key can be included to filter items based on a search string present in the item's summary.
             - Optionally, a 'content_tags' key can be provided to specify the dot-notation path for content tags within each feed item. If found, a new key "content_tags" is added to the dictionary.
             - Optionally, an 'interval' key can be provided to specify the polling interval in seconds for this specific feed. If not provided, the global 'interval' value is used.
+            - Optionally, a 'name' key can be provided to specify the name of the feed. This name will be added as "feed_name" in each event.
         required: true
         type: list
         elements: dict
@@ -33,6 +33,7 @@ options:
               search: "python"
               content_tags: "tags.label"
               interval: 30
+              name: "Example RSS"
     interval:
         description:
             - The default interval, in seconds, at which the script polls the feeds. This value is used when an individual 'interval' is not specified in the 'feed_configs'.
@@ -44,35 +45,6 @@ options:
         required: false
         default: False
         type: bool
-'''
-
-EXAMPLES = r'''
-- name: New Ansible blog post notifier
-  hosts: localhost
-  sources:
-    - name: RSS feed items as events
-      cloin.eda.rss:
-        feed_configs:
-          - name: Ansible blog
-            url: https://www.ansible.com/blog/rss.xml
-            search: ""
-            content_tags: tags
-            interval: 300
-        interval: 7200
-        most_recent_item: false
-      filters:
-        - ansible.eda.json_filter:
-            exclude_keys:
-              - summary
-
-  rules:
-    - name: New EDA blog
-      condition: |
-        event.id is defined and
-        event.content_tags is search("Event-Driven Ansible",ignorecase=true)
-      action:
-        debug:
-
 '''
 
 def get_nested_value(dictionary: Dict[str, Any], keys: List[str]) -> Any:
@@ -100,33 +72,39 @@ async def poll_feed(queue: asyncio.Queue, session: aiohttp.ClientSession, feed_c
     content_tags_path = feed_config.get('content_tags')
     content_tags_keys = content_tags_path.split('.') if content_tags_path else []
     interval = feed_config.get('interval', default_interval)
+    feed_name = feed_config.get('name', '')
     last_updated = None
     first_poll = True
 
     while True:
-        feed_data = await fetch_rss_feed(session, feed_url)
-        if feed_data:
-            feed = feedparser.parse(feed_data)
+        try:
+            feed_data = await fetch_rss_feed(session, feed_url)
+            if feed_data:
+                feed = feedparser.parse(feed_data)
 
-            if first_poll and most_recent_item and feed.entries:
-                entry = feed.entries[0]
-                if search_string is None or search_string in entry.summary:
-                    content_tags = get_nested_value(entry, content_tags_keys) if content_tags_keys else None
-                    if content_tags is not None:
-                        entry['content_tags'] = content_tags
-                    await queue.put(entry)
-                first_poll = False
-            elif last_updated:
-                for entry in feed.entries:
-                    if entry.updated_parsed > last_updated and (search_string is None or search_string in entry.summary):
+                if first_poll and most_recent_item and feed.entries:
+                    entry = feed.entries[0]
+                    if search_string is None or search_string in entry.summary:
                         content_tags = get_nested_value(entry, content_tags_keys) if content_tags_keys else None
                         if content_tags is not None:
                             entry['content_tags'] = content_tags
+                        entry['feed_name'] = feed_name
                         await queue.put(entry)
+                    first_poll = False
+                elif last_updated:
+                    for entry in feed.entries:
+                        if entry.updated_parsed > last_updated and (search_string is None or search_string in entry.summary):
+                            content_tags = get_nested_value(entry, content_tags_keys) if content_tags_keys else None
+                            if content_tags is not None:
+                                entry['content_tags'] = content_tags
+                            entry['feed_name'] = feed_name
+                            await queue.put(entry)
 
-            last_updated = feed.feed.updated_parsed if hasattr(feed.feed, 'updated_parsed') else None
-        else:
-            logger.error(f"No data fetched for {feed_url}")
+                last_updated = feed.feed.updated_parsed if hasattr(feed.feed, 'updated_parsed') else None
+            else:
+                logger.error(f"No data fetched for {feed_url}")
+        except Exception as e:
+            logger.error(f"Error polling {feed_url}: {e}")
         await asyncio.sleep(interval)
 
 async def main(queue: asyncio.Queue, args: Dict[str, Any]):
