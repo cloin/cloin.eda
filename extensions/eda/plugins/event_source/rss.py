@@ -47,6 +47,35 @@ options:
         type: bool
 '''
 
+EXAMPLES = r'''
+- name: New Ansible blog post notifier
+  hosts: localhost
+  sources:
+    - name: RSS feed items as events
+      cloin.eda.rss:
+        feed_configs:
+          - name: Ansible blog
+            url: https://www.ansible.com/blog/rss.xml
+            search: ""
+            content_tags: tags
+            interval: 300
+        interval: 7200
+        most_recent_item: false
+      filters:
+        - ansible.eda.json_filter:
+            exclude_keys:
+              - summary
+
+  rules:
+    - name: New EDA blog
+      condition: |
+        event.id is defined and
+        event.content_tags is search("Event-Driven Ansible",ignorecase=true)
+      action:
+        debug:
+
+'''
+
 def get_nested_value(dictionary: Dict[str, Any], keys: List[str]) -> Any:
     for key in keys:
         if dictionary is None or not isinstance(dictionary, dict):
