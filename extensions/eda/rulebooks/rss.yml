@@ -2,7 +2,7 @@
   hosts: localhost
   sources:
     - name: RSS feed items as events
-      cloin.eda.rss:
+      rss:
         feed_configs:
           - name: Ansible blog
             url: https://www.ansible.com/blog/rss.xml
@@ -14,13 +14,13 @@
             url: https://hnrss.org/frontpage
             search:
             content_tags:
-            interval: 300
+            interval:
 
           - name: Cloin Mastodon
             url: https://techhub.social/@cloin.rss
             search:
             content_tags:
-            interval: 300
+            interval: 3600
 
         interval: 7200
         most_recent_item: true

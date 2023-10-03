@@ -100,7 +100,7 @@ async def poll_feed(queue: asyncio.Queue, session: aiohttp.ClientSession, feed_c
     search_string = feed_config.get('search')
     content_tags_path = feed_config.get('content_tags')
     content_tags_keys = content_tags_path.split('.') if content_tags_path else []
-    interval = feed_config.get('interval', default_interval)
+    interval = feed_config.get('interval') or default_interval
     feed_name = feed_config.get('name', '')
     last_updated = None
     first_poll = True
