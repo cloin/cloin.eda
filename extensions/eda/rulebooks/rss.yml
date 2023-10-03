@@ -9,17 +9,43 @@
             search: ""
             content_tags: tags
             interval: 300
+
+          - name: HackerNews
+            url: https://hnrss.org/frontpage
+            search:
+            content_tags:
+            interval: 300
+
+          - name: Cloin Mastodon
+            url: https://techhub.social/@cloin.rss
+            search:
+            content_tags:
+            interval: 300
+
         interval: 7200
-        most_recent_item: false
+        most_recent_item: true
       filters:
         - ansible.eda.json_filter:
             exclude_keys:
-              - summary
+              - content
+              - summary_detail
 
   rules:
     - name: New EDA blog
       condition: |
-        event.id is defined and
+        event.feed_name == "Ansible blog" and
         event.content_tags is search("Event-Driven Ansible",ignorecase=true)
+      action:
+        debug:
+
+    - name: New HackerNews frontpage post
+      condition: |
+        event.feed_name == "HackerNews"
+      action:
+        debug:
+
+    - name: New Mastodon post by Cloin
+      condition: |
+        event.feed_name == "Cloin Mastodon"
       action:
         debug:
