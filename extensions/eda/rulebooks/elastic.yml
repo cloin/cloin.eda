@@ -1,7 +1,7 @@
 - name: Elastic events
   hosts: localhost
   sources:
-    - elastic:
+    - cloin.eda.elastic:
         elastic_host: "{{ elk_host }}"
         elastic_port: "{{ elk_port }}"
         elastic_username: "{{ elk_username }}"
