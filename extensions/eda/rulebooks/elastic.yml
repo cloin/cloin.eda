@@ -6,7 +6,7 @@
         elastic_port: "{{ elk_port }}"
         elastic_username: "{{ elk_username }}"
         elastic_password: "{{ elk_password }}"
-        elastic_index_pattern: "{{ elk_index_patter }}"
+        elastic_index_pattern: "{{ elk_index_pattern }}"
         query: |
           term:
             container.name.keyword: nginx
