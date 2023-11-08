@@ -2,11 +2,11 @@
   hosts: localhost
   sources:
     - elastic:
-        elastic_host: elasticsearch
-        elastic_port: 9200
-        elastic_username: elastic
-        elastic_password: elastic
-        elastic_index_pattern: filebeat-*
+        elastic_host: "{{ elk_host }}"
+        elastic_port: "{{ elk_port }}"
+        elastic_username: "{{ elk_username }}"
+        elastic_password: "{{ elk_password }}"
+        elastic_index_pattern: "{{ elk_index_patter }}"
         query: |
           term:
             container.name.keyword: nginx
