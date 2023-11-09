@@ -1,12 +1,12 @@
 - name: Elastic events
   hosts: localhost
   sources:
-    - cloin.eda.elastic:
-        elastic_host: "{{ elk_host }}"
-        elastic_port: "{{ elk_port }}"
-        elastic_username: "{{ elk_username }}"
-        elastic_password: "{{ elk_password }}"
-        elastic_index_pattern: "{{ elk_index_pattern }}"
+    - cloin.eda.elastic_http:
+        elastic_host: "{{ elk_host }}" # IP or fqdn - do not use https or http prefix
+        elastic_port: "{{ elk_port }}" # port number, default is 9200
+        elastic_username: "{{ elk_username }}" # elastic username, default is elastic
+        elastic_password: "{{ elk_password }}" # elastic password
+        elastic_index_pattern: "{{ elk_index_pattern }}" # index pattern default is filebeat-*
         query: |
           term:
             container.name.keyword: nginx
