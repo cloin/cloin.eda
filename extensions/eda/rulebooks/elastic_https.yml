@@ -1,0 +1,19 @@
+- name: Elastic events
+  hosts: localhost
+  sources:
+    - cloin.eda.elastic_https:
+        elastic_host: "{{ elk_host }}"
+        elastic_port: "{{ elk_port }}"
+        elastic_username: "{{ elk_username }}"
+        elastic_password: "{{ elk_password }}"
+        elastic_index_pattern: "{{ elk_index_pattern }}"
+        query: |
+          term:
+            container.name.keyword: nginx
+        interval: 5
+
+  rules:
+    - name: Debug event
+      condition: event.ecs is defined and event.nginx.log_level == "error"
+      action:
+        debug:
