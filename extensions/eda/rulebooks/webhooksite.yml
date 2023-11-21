@@ -1,0 +1,16 @@
+- name: webhook.site events
+  hosts: localhost
+  sources:
+    - name: Webhook.site POSTs as events
+      webhooksite.py:
+        token: 
+        api_url: "https://webhook.site/token/{token}/requests"
+        interval: 10
+        skip_first_poll: true
+
+  rules:
+    - name: R1 - New webhook.site POST
+      condition: |
+        event.meta is defined
+      action:
+        debug:
