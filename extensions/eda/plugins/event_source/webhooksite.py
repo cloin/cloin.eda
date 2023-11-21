@@ -1,5 +1,5 @@
 DOCUMENTATION = r'''
-module: webhooksite_events
+module: webhooksite
 short_description: Event-Driven Ansible source plugin for Webhook.site events
 description:
     - Poll Webhook.site API for new requests
@@ -20,7 +20,7 @@ options:
         description:
             - The interval, in seconds, at which the script polls the API (mind the rate limit!)
         required: false
-        default: 10
+        default: 15
     skip_first_poll:
         description:
             - Whether to skip returning items on the first poll
@@ -52,7 +52,7 @@ async def fetch_webhook_site_requests(session, api_url, start_time, token):
         return None
 
 async def main(queue: asyncio.Queue, args: dict):
-    interval = int(args.get("interval", 10))
+    interval = int(args.get("interval", 15))
     token = args.get("token")
     api_url = args.get("api_url", "https://webhook.site/token/{token}/requests").format(token=token)
     skip_first_poll = args.get("skip_first_poll", True)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     args = {
         "token": os.getenv("WEBHOOK_SITE_TOKEN"),
         "api_url": os.getenv("WEBHOOK_SITE_API_URL", "https://webhook.site/token/{token}/requests"),
-        "interval": os.getenv("INTERVAL", "10"),
+        "interval": os.getenv("INTERVAL", "15"),
         "skip_first_poll": os.getenv("SKIP_FIRST_POLL", "true").lower() == "true",
     }
 
