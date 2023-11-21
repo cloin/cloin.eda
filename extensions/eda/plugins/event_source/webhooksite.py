@@ -28,6 +28,25 @@ options:
         default: true
 '''
 
+EXAMPLES = r'''
+- name: webhook.site events
+  hosts: localhost
+  sources:
+    - name: Webhook.site POSTs as events
+      webhooksite:
+        token: "d40e1855-5555-5555-5555-5566c1791540"
+        api_url: "https://webhook.site/token/{token}/requests"
+        interval: 15
+        skip_first_poll: true
+
+  rules:
+    - name: R1 - New webhook.site POST with content
+      condition: |
+        event.content.foo == "bar"
+      action:
+        debug:
+'''
+
 import aiohttp
 import asyncio
 import os
@@ -40,7 +59,7 @@ async def fetch_webhook_site_requests(session, api_url, start_time, token):
     }
     headers = {"Token": token}
     try:
-        async with session.get(api_url, params=params, headers=headers, ssl=False) as response:
+        async with session.get(api_url, params=params, headers=headers) as response:
             if response.status == 200:
                 return await response.json()
             else:
@@ -70,7 +89,6 @@ async def main(queue: asyncio.Queue, args: dict):
                     request_id = request.get('uuid')
                     if request_id not in processed_requests:
                         if not (first_poll and skip_first_poll):
-                            # Parse the 'content' field from string to dictionary
                             if 'content' in request and request['content']:
                                 try:
                                     request['content'] = json.loads(request['content'])
