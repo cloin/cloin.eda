@@ -51,7 +51,10 @@ import aiohttp
 import asyncio
 import os
 import json
+import logging
 from datetime import datetime, timedelta
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def fetch_webhook_site_requests(session, api_url, start_time, token):
     params = {
@@ -63,11 +66,11 @@ async def fetch_webhook_site_requests(session, api_url, start_time, token):
             if response.status == 200:
                 return await response.json()
             else:
-                print(f"HTTP Status Code: {response.status}")
-                print("Response Text:", await response.text())
+                logging.error(f"HTTP Status Code: {response.status}")
+                logging.error("Response Text: %s", await response.text())
                 return None
     except aiohttp.ClientError as e:
-        print(f"Request failed: {e}")
+        logging.error(f"Request failed: {e}")
         return None
 
 async def main(queue: asyncio.Queue, args: dict):
@@ -82,21 +85,25 @@ async def main(queue: asyncio.Queue, args: dict):
         first_poll = True
 
         while True:
-            response = await fetch_webhook_site_requests(session, api_url, start_time, token)
+            response_data = await fetch_webhook_site_requests(session, api_url, start_time, token)
 
-            if response and 'data' in response:
-                for request in response['data']:
+            if response_data:
+                new_requests = response_data.get('data', [])
+                if first_poll:
+                    logging.info("First poll URL: %s", api_url)
+                    logging.info("Number of requests discovered: %d", len(new_requests))
+
+                for request in new_requests:
                     request_id = request.get('uuid')
-                    if request_id not in processed_requests:
-                        if not (first_poll and skip_first_poll):
-                            if 'content' in request and request['content']:
-                                try:
-                                    request['content'] = json.loads(request['content'])
-                                except json.JSONDecodeError:
-                                    print("Failed to parse JSON content")
-                                    continue
-                            await queue.put(request)
+                    if request_id and request_id not in processed_requests:
                         processed_requests.add(request_id)
+                        if not (first_poll and skip_first_poll):
+                            try:
+                                request['content'] = json.loads(request.get('content', '{}'))
+                            except json.JSONDecodeError:
+                                logging.error("Failed to parse JSON content")
+                            else:
+                                await queue.put(request)
 
             first_poll = False
             await asyncio.sleep(interval)
@@ -112,6 +119,6 @@ if __name__ == "__main__":
 
     class MockQueue:
         async def put(self, event):
-            print(event)
+            logging.info(event)
 
     asyncio.run(main(MockQueue(), args))
