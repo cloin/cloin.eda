@@ -31,6 +31,7 @@ options:
 import aiohttp
 import asyncio
 import os
+import json
 from datetime import datetime, timedelta
 
 async def fetch_webhook_site_requests(session, api_url, start_time, token):
@@ -64,18 +65,22 @@ async def main(queue: asyncio.Queue, args: dict):
         while True:
             response = await fetch_webhook_site_requests(session, api_url, start_time, token)
 
-            if first_poll:
-                if response and 'data' in response:
-                    processed_requests.update(request.get('uuid') for request in response['data'])
-                first_poll = False
-            else:
-                if response and 'data' in response:
-                    for request in response['data']:
-                        request_id = request.get('uuid')
-                        if request_id not in processed_requests:
+            if response and 'data' in response:
+                for request in response['data']:
+                    request_id = request.get('uuid')
+                    if request_id not in processed_requests:
+                        if not (first_poll and skip_first_poll):
+                            # Parse the 'content' field from string to dictionary
+                            if 'content' in request and request['content']:
+                                try:
+                                    request['content'] = json.loads(request['content'])
+                                except json.JSONDecodeError:
+                                    print("Failed to parse JSON content")
+                                    continue
                             await queue.put(request)
-                            processed_requests.add(request_id)
+                        processed_requests.add(request_id)
 
+            first_poll = False
             await asyncio.sleep(interval)
             start_time = datetime.utcnow() - timedelta(minutes=5)
 
