@@ -3,7 +3,7 @@
   sources:
     - name: Webhook.site POSTs as events
       cloin.eda.webhooksite:
-        api_url: "https://webhook.site/token/{token}/requests"
+        token: "{{ token }}"
         interval: 10
         skip_first_poll: true
 
