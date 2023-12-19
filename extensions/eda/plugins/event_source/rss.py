@@ -48,29 +48,67 @@ options:
 '''
 
 EXAMPLES = r'''
-- name: New Ansible blog post notifier
+- name: New blog post notifier
   hosts: localhost
   sources:
     - name: RSS feed items as events
       cloin.eda.rss:
+        interval: 7200
+        most_recent_item: true
         feed_configs:
           - name: Ansible blog
             url: https://www.ansible.com/blog/rss.xml
             search: ""
             content_tags: tags
             interval: 300
-        interval: 7200
-        most_recent_item: false
+
+          - name: Ansible Forum
+            url: https://forum.ansible.com/latest.rss
+            search:
+            content_tags: tags
+            interval: 30
+
+          - name: Cloin Mastodon
+            url: https://techhub.social/@cloin.rss
+            search:
+            content_tags:
+            interval: 3600
+
+          - name: HackerNews
+            url: https://hnrss.org/frontpage
+            search:
+            content_tags:
+            interval:
       filters:
         - ansible.eda.json_filter:
             exclude_keys:
-              - summary
+              - content
+              - summary_detail
 
   rules:
-    - name: New EDA blog
+    - name: R1 - New Event-Driven Ansible blog
       condition: |
-        event.id is defined and
+        event.feed_name == "Ansible blog" and
         event.content_tags is search("Event-Driven Ansible",ignorecase=true)
+      action:
+        debug:
+
+    - name: R2 - New post on Ansible Forum
+      condition: |
+        event.feed_name == "Ansible Forum" and
+        event.source.title is search("Event-Driven Ansible",ignorecase=true)
+      action:
+        debug:
+
+    - name: R3 - New Mastodon post by Cloin
+      condition: |
+        event.feed_name == "Cloin Mastodon"
+      action:
+        debug:
+
+    - name: R4 - New HackerNews frontpage post
+      condition: |
+        event.feed_name == "HackerNews"
       action:
         debug:
 
