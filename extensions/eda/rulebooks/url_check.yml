@@ -1,0 +1,14 @@
+---
+- name: DB Check
+  hosts: localhost
+  sources:
+    - name: check web server
+      url_check_content:
+        urls:
+          - http://host.containers.internal:8080/status.json
+        delay: 1
+  rules:
+    - name: status content
+      condition: event.url_check.status == 'up'
+      action:
+        debug:
