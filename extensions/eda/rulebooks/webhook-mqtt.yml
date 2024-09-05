@@ -1,0 +1,24 @@
+- name: Forward webhook to mqtt
+  hosts: all
+  sources:
+    - name: Webhook POSTs to mqtt
+      ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+      filters:
+        - cloin.eda.mqtt:
+            mqtt_broker: 100.83.125.88
+            mqtt_port: 1883
+
+  rules:
+    - name: SUCCESS - Forward to mqtt
+      condition: |
+        event.meta.mqtt_status == "success"
+      action:
+        debug:
+
+    - name: FAILURE - Forward to mqtt
+      condition: |
+        event.meta.mqtt_status == "failure"
+      action:
+        debug:
