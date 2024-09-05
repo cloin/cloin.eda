@@ -7,7 +7,7 @@
         port: 5000
       filters:
         - cloin.eda.mqtt:
-            mqtt_broker: 100.83.125.88
+            mqtt_broker: broker
             mqtt_port: 1883
 
   rules:
