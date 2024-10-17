@@ -11,10 +11,17 @@ Arguments:
 
 Example:
 -------
-    - ansible.eda.alertmanager_filter:
-        data_alerts_path: alerts
-        data_host_path: labels.instance
-        data_path_separator: .
+    - name: Respond to webhook POST
+      hosts: localhost
+      sources:
+        - ansible.eda.webhook:
+            host: 0.0.0.0
+            port: 5000
+          filters:
+            - cloin.eda.alertmanager_filter:
+                data_alerts_path: alerts
+                data_host_path: labels.instance
+                data_path_separator: .
 """
 
 from __future__ import annotations
