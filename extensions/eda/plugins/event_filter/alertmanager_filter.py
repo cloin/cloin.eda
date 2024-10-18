@@ -30,7 +30,7 @@ Example:
 
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Optional, Generator
 from dpath import util
 import logging
 
@@ -42,7 +42,7 @@ def main(
     data_host_path: str = "labels.instance",
     data_path_separator: str = ".",
     skip_original_data: bool = False,
-) -> Union[dict[str, Any], None]:
+) -> Generator[dict[str, Any], None, None]:
     """Extract alert data and host information from an event."""
     alerts = []
     # If data_alerts_path is empty, treat the entire event as a single alert.
