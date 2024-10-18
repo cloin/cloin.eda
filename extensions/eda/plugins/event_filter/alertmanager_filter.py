@@ -30,7 +30,7 @@ Example:
 
 from __future__ import annotations
 
-from typing import Any, Optional, List
+from typing import Any
 from dpath import util
 import logging
 
@@ -42,7 +42,7 @@ def main(
     data_host_path: str = "labels.instance",
     data_path_separator: str = ".",
     skip_original_data: bool = False,
-) -> List[dict[str, Any]]:
+) -> None:
     """Extract alert data and host information from an event."""
     alerts = []
     # If data_alerts_path is empty, treat the entire event as a single alert.
@@ -58,7 +58,12 @@ def main(
         except (KeyError, TypeError):
             # Log an error if the specified path does not exist in the event or if the path is incorrect.
             LOGGER.error(f"Event {event} does not contain path {data_alerts_path}")
-            return [event]
+            process_event(event)
+            return
+
+    # Process the original event if skip_original_data is False.
+    if not skip_original_data:
+        process_event(event)
 
     for alert in alerts:
         hosts = []
@@ -84,8 +89,11 @@ def main(
                 "hosts": hosts
             }
         }
+        process_event(new_event)
 
-    print(new_event)
+def process_event(event: dict[str, Any]) -> None:
+    """Process each event by printing or any other required action."""
+    print(event)
 
 def clean_host(host: str) -> str:
     """Remove port from host string if it exists."""
