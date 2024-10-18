@@ -22,7 +22,7 @@ Example:
             port: 5000
           filters:
             - ansible.eda.alertmanager_filter:
-                data_alerts_path: payload.alerts
+                data_alerts_path: alerts
                 data_host_path: labels.instance
                 data_path_separator: .
                 skip_original_data: false
@@ -30,7 +30,7 @@ Example:
 
 from __future__ import annotations
 
-from typing import Any, Optional, Generator
+from typing import Any, Optional, List
 from dpath import util
 import logging
 
@@ -42,7 +42,7 @@ def main(
     data_host_path: str = "labels.instance",
     data_path_separator: str = ".",
     skip_original_data: bool = False,
-) -> Generator[dict[str, Any], None, None]:
+) -> List[dict[str, Any]]:
     """Extract alert data and host information from an event."""
     alerts = []
     # If data_alerts_path is empty, treat the entire event as a single alert.
@@ -58,12 +58,7 @@ def main(
         except (KeyError, TypeError):
             # Log an error if the specified path does not exist in the event or if the path is incorrect.
             LOGGER.error(f"Event {event} does not contain path {data_alerts_path}")
-            yield event
-            return
-
-    # Yield the original event if skip_original_data is False.
-    if not skip_original_data:
-        yield event
+            return [event]
 
     for alert in alerts:
         hosts = []
@@ -89,7 +84,8 @@ def main(
                 "hosts": hosts
             }
         }
-        yield new_event
+
+    print(new_event)
 
 def clean_host(host: str) -> str:
     """Remove port from host string if it exists."""
