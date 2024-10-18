@@ -8,6 +8,9 @@ Arguments:
       Defaults to "labels.instance". Use empty string "" if no host information is needed.
     * data_path_separator: The separator to interpret data_alerts_path and data_host_path.
       Defaults to ".".
+    * skip_original_data: true/false. Default to false.
+      true: Only alert data will be returned as events.
+      false: Both the original event and each parsed alert will be returned as events.
 
 Example:
 -------
@@ -22,11 +25,12 @@ Example:
                 data_alerts_path: payload.alerts
                 data_host_path: labels.instance
                 data_path_separator: .
+                skip_original_data: false
 """
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from dpath import util
 import logging
 
@@ -37,7 +41,8 @@ def main(
     data_alerts_path: str = "alerts",
     data_host_path: str = "labels.instance",
     data_path_separator: str = ".",
-) -> list[dict[str, Any]]:
+    skip_original_data: bool = False,
+) -> Union[dict[str, Any], None]:
     """Extract alert data and host information from an event."""
     alerts = []
     # If data_alerts_path is empty, treat the entire event as a single alert.
@@ -50,23 +55,30 @@ def main(
             # Ensure alerts is a list, even if only one alert is found.
             if not isinstance(alerts, list):
                 alerts = [alerts]
-        except KeyError:
-            # Log an error if the specified path does not exist in the event.
+        except (KeyError, TypeError):
+            # Log an error if the specified path does not exist in the event or if the path is incorrect.
             LOGGER.error(f"Event {event} does not contain path {data_alerts_path}")
-            return [event]
+            yield event
+            return
 
-    events = []
+    # Yield the original event if skip_original_data is False.
+    if not skip_original_data:
+        yield event
+
     for alert in alerts:
         hosts = []
         if data_host_path:
             try:
                 # Extract the host information from the alert using the specified JSON path.
                 host = util.get(alert, data_host_path, separator=data_path_separator)
-                # Clean the host value (e.g., remove port if present).
-                host = clean_host(host)
-                if host is not None:
-                    hosts.append(host)
-            except KeyError:
+                # Ensure the extracted host is a string or list of strings.
+                if isinstance(host, (str, list)):
+                    if isinstance(host, str):
+                        host = clean_host(host)
+                        hosts.append(host)
+                    elif isinstance(host, list):
+                        hosts.extend([clean_host(h) for h in host if isinstance(h, str)])
+            except (KeyError, TypeError):
                 # Log an error if the specified host path does not exist in the alert.
                 LOGGER.error(f"Alert {alert} does not contain path {data_host_path}")
 
@@ -77,9 +89,7 @@ def main(
                 "hosts": hosts
             }
         }
-        events.append(new_event)
-
-    return events
+        yield new_event
 
 def clean_host(host: str) -> str:
     """Remove port from host string if it exists."""
