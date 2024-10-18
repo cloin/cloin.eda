@@ -18,8 +18,8 @@ Example:
             host: 0.0.0.0
             port: 5000
           filters:
-            - cloin.eda.alertmanager_filter:
-                data_alerts_path: alerts
+            - ansible.eda.alertmanager_filter:
+                data_alerts_path: payload.alerts
                 data_host_path: labels.instance
                 data_path_separator: .
 """
@@ -37,7 +37,7 @@ def main(
     data_alerts_path: str = "alerts",
     data_host_path: str = "labels.instance",
     data_path_separator: str = ".",
-) -> dict[str, Any]:
+) -> list[dict[str, Any]]:
     """Extract alert data and host information from an event."""
     alerts = []
     # If data_alerts_path is empty, treat the entire event as a single alert.
@@ -53,9 +53,9 @@ def main(
         except KeyError:
             # Log an error if the specified path does not exist in the event.
             LOGGER.error(f"Event {event} does not contain path {data_alerts_path}")
-            return event
+            return [event]
 
-    all_hosts = []
+    events = []
     for alert in alerts:
         hosts = []
         if data_host_path:
@@ -70,15 +70,16 @@ def main(
                 # Log an error if the specified host path does not exist in the alert.
                 LOGGER.error(f"Alert {alert} does not contain path {data_host_path}")
 
-        # Add the extracted hosts to the list of all hosts.
-        all_hosts.extend(hosts)
+        # Create a new event for each alert, including the extracted host information.
+        new_event = {
+            "alert": alert,
+            "meta": {
+                "hosts": hosts
+            }
+        }
+        events.append(new_event)
 
-    # Ensure the event has a "meta" key and add the extracted hosts under "meta".
-    if "meta" not in event:
-        event["meta"] = {}
-    event["meta"]["hosts"] = all_hosts
-
-    return event
+    return events
 
 def clean_host(host: str) -> str:
     """Remove port from host string if it exists."""
